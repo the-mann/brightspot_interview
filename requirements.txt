@@ -14,3 +14,7 @@ django-cors-headers
 
 # For comments
 django-treebeard
+
+# For auth
+dj-rest-auth
+djangorestframework-simplejwt

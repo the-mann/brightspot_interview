@@ -24,12 +24,13 @@ SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", 'django-insecure-vi5d@!fw4egk7d
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
 
 # Application definition
 
 INSTALLED_APPS = [
     'rest_framework',
+    'rest_framework.authtoken',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -38,8 +39,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     # Tree comments
     'treebeard',
-    # CORS
+    # CORS/auth
     'corsheaders',
+    'dj_rest_auth',
     # documentation,
     'drf_spectacular',
     'django_extensions',
@@ -113,6 +115,14 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
     ],
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
+    )
+}
+
+REST_AUTH = {
+    'USE_JWT': True,
+    'JWT_AUTH_COOKIE': 'jwt-auth',
 }
 
 # Internationalization
@@ -136,4 +146,8 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:9000",
+]
+
+CORS_EXPOSE_HEADERS = ['Content-Type', 'X-CSRFToken']

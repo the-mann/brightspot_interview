@@ -1,3 +1,5 @@
+from django.http import HttpResponse
+from django.views.decorators.csrf import ensure_csrf_cookie
 from rest_framework import viewsets, permissions, status, mixins
 from rest_framework.generics import CreateAPIView
 from rest_framework.response import Response
@@ -37,13 +39,18 @@ class BlogPostViewSet(viewsets.ModelViewSet):
 
 
 class BlogPostReplyViewSet(mixins.CreateModelMixin,
-                   mixins.RetrieveModelMixin,
-                   # mixins.UpdateModelMixin,
-                   # mixins.DestroyModelMixin,
-                   GenericViewSet):
+                           mixins.RetrieveModelMixin,
+                           # mixins.UpdateModelMixin,
+                           # mixins.DestroyModelMixin,
+                           GenericViewSet):
     queryset = BlogPostComment.objects.all()
-    serializer_class = CommentSerializer
+    serializer_class = SubCommentSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
+
+
+@ensure_csrf_cookie
+def csrf_view(request):
+    return HttpResponse('ok')

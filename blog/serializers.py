@@ -23,10 +23,9 @@ class UserSerializer(serializers.ModelSerializer):
 #         model = Group
 #         fields = ['url', 'name']
 
-
-class CommentSerializer(serializers.ModelSerializer):
+class SubCommentSerializer(serializers.ModelSerializer):
     comments = serializers.SerializerMethodField(
-        read_only=True, method_name="get_comments")
+        read_only=True, method_name="get_subcomments")
 
     owner = UserSerializer(many=False, read_only=True)
     blogpost = serializers.PrimaryKeyRelatedField(many=False, queryset=BlogPost.objects.all())
@@ -37,10 +36,9 @@ class CommentSerializer(serializers.ModelSerializer):
         model = BlogPostComment
         fields = ('id', 'comments', 'created', 'owner', 'body', "blogpost", "parent_comment")
 
-    def get_comments(self, obj):
-        # check if current comment is a root node.
+    def get_subcomments(self, obj):
         children = BlogPostComment.objects.get(pk=obj.id).get_children()
-        serializer = CommentSerializer(instance=children, many=True)
+        serializer = SubCommentSerializer(instance=children, many=True)
         return serializer.data
 
     def create(self, validated_data):
@@ -59,7 +57,14 @@ class CommentSerializer(serializers.ModelSerializer):
 
 class BlogPostSerializer(serializers.ModelSerializer):
     owner = UserSerializer(many=False, read_only=True)
-    comments = CommentSerializer(many=True, read_only=True)
+    comments = serializers.SerializerMethodField(
+        read_only=True, method_name="get_comments")
+
+    def get_comments(self, obj):
+        # check if current comment is a root node.
+        children = BlogPostComment.get_root_nodes().filter(blogpost=obj.id)
+        serializer = SubCommentSerializer(instance=children, many=True)
+        return serializer.data
 
     class Meta:
         model = BlogPost

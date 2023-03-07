@@ -20,7 +20,7 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from rest_framework import routers, viewsets
 
 from blog.serializers import UserSerializer
-from blog.views import BlogPostViewSet, BlogPostReplyViewSet
+from blog.views import BlogPostViewSet, BlogPostReplyViewSet, csrf_view
 
 
 # ViewSets define the view behavior.
@@ -37,10 +37,11 @@ router.register(r'comments', BlogPostReplyViewSet)
 
 
 urlpatterns = [
-    path('', include(router.urls)),
-    path('schema/', SpectacularAPIView.as_view(), name='schema'),
-    path('schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    path('api/', include(router.urls)),
+    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
+    path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
     path('admin/', admin.site.urls),
-    path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
-
+    # path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    path('api/dj-rest-auth/', include('dj_rest_auth.urls')),
+    path('api/csrf', csrf_view, name='csrf'),
 ]
