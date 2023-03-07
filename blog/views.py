@@ -1,7 +1,12 @@
-from rest_framework import viewsets
+from rest_framework import viewsets, permissions, status, mixins
+from rest_framework.generics import CreateAPIView
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework.viewsets import GenericViewSet
 
-from blog.models import BlogPost
-from blog.serializers import BlogPostSerializer
+from blog.models import *
+from blog.permissions import IsOwnerOrReadOnly
+from blog.serializers import *
 
 
 # class UserViewSet(viewsets.ModelViewSet):
@@ -24,3 +29,21 @@ from blog.serializers import BlogPostSerializer
 class BlogPostViewSet(viewsets.ModelViewSet):
     queryset = BlogPost.objects.all()
     serializer_class = BlogPostSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly,
+                          IsOwnerOrReadOnly]
+
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+
+
+class BlogPostReplyViewSet(mixins.CreateModelMixin,
+                   mixins.RetrieveModelMixin,
+                   # mixins.UpdateModelMixin,
+                   # mixins.DestroyModelMixin,
+                   GenericViewSet):
+    queryset = BlogPostComment.objects.all()
+    serializer_class = CommentSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)

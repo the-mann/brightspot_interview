@@ -2,3 +2,15 @@ django
 djangorestframework
 markdown
 django-filter
+
+# For documentation/OpenAP Swagger generation
+drf-spectacular
+
+# For `python manage.py show_urls`
+django_extensions
+
+# For CORS
+django-cors-headers
+
+# For comments
+django-treebeard
